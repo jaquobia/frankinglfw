@@ -120,7 +120,7 @@
 
 	void cursorPos(GLFWwindow* window, double x, double y) {
 		if(callback) {
-			getEnv()->CallVoidMethod(callback, cursorPosId, (jlong)window, (jint)x, (jint)y);
+			getEnv()->CallVoidMethod(callback, cursorPosId, (jlong)window, (jdouble)x, (jdouble)y);
 		}
 	}
 
