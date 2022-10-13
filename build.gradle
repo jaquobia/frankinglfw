@@ -1,0 +1,30 @@
+plugins {
+    id 'java-library'
+}
+
+group 'io.github.jaquobia'
+version '1.1.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation("org.jogamp.gluegen:gluegen-rt-main:2.3.2")
+    testImplementation("org.jogamp.jogl:jogl-all-main:2.3.2")
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = ''
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
