@@ -1,8 +1,9 @@
 plugins {
     id 'java-library'
+    id 'maven-publish'
 }
 
-group 'io.github.jaquobia'
+group 'com.github.jaquobia'
 version '1.1.0'
 
 repositories {
@@ -19,12 +20,7 @@ task sourcesJar(type: Jar, dependsOn: classes) {
     from sourceSets.main.allSource
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = ''
-    from javadoc.destinationDir
-}
-
 artifacts {
     archives sourcesJar
-    archives javadocJar
+    archives jar
 }
