@@ -1,7 +1,7 @@
 [![](https://jitpack.io/v/jaquobia/frankinglfw.svg)](https://jitpack.io/#jaquobia/frankinglfw)
 
 # frankinglfw
-A rudimentary fork? of JGLFW to modern glfw
+A rudimentary fork? of JGLFW to modern glfw  
 Named as frankin from frankenstein (yes its mispelled), since its a cursed port of an older java library to a newer c++ glfw version
 
 # Why was this made?
