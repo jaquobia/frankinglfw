@@ -2,10 +2,7 @@ import com.jogamp.opengl.*;
 import io.github.jaquobia.Glfw;
 import io.github.jaquobia.GlfwCallback;
 
-import java.util.logging.Logger;
-
 public class Main {
-    public static Logger logger = Logger.getLogger("Test");
 
     public static void main(String[] args) {
         Glfw.glfwInit();

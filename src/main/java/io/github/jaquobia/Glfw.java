@@ -5,10 +5,30 @@ import java.util.List;
 
 public class Glfw {
 
+	/**
+	 * Practically sto.. *cough* copied from mc b1.7.3
+	 * @param libName name of the library
+	 * @param libPrefix if lib should be prefixed to the libname for unix
+	 * @param macLibPrefix if lib should be prefixed to the libname for mac
+	 * @param macDylib if .dylib should be used for mac, .so otherwise
+	 * @return a true name for the library based on the OS
+	 */
+	public static String getOsDynamicLibName(String libName, boolean libPrefix, boolean macLibPrefix, boolean macDylib) {
+		String osName = System.getProperty("os.name").toLowerCase();
+		if (osName.contains("win")) {
+			return (libName + ".dll");
+		} else if (osName.contains("mac")) {
+			return ((macLibPrefix ? "lib" : "") + libName + (macDylib ? ".dylib" : ".so"));
+		} else { // this should be some unix-like architecture
+			return ((macLibPrefix ? "lib" : "") + libName + ".so");
+		}
+	}
 	static {
 		try {
 			// https://github.com/adamheinrich/native-utils
-			NativeUtils.loadLibraryFromJar("/libFrankinGlfw.so");
+			String libName = getOsDynamicLibName("FrankinGlfw", true, true, false);
+			System.out.println("Loading dynamic library " + libName);
+			NativeUtils.loadLibraryFromJar("/" + libName);
 		} catch (Exception e) {e.printStackTrace();}
 	}
 
@@ -393,22 +413,13 @@ public class Glfw {
 
 	public static native boolean glfwInit();
 
-	public static native void glfwTerminate(); /*
-		if (callback) {
-			env->DeleteGlobalRef(callback);
-			callback = 0;
-		}
-		destroyEnv();
-		glfwTerminate();
-	*/
+	public static native void glfwTerminate();
 
 	public static String glfwGetVersion() {
 		return "3.4.0";
 	}
 
-	public static native String glfwGetVersionString(); /*
-		return env->NewStringUTF(glfwGetVersionString());
-	*/
+	public static native String glfwGetVersionString();
 
 	public static long[] glfwGetMonitors() {
 		long[] monitors = new long[256]; // 256 monitors are enough for everyone...
@@ -418,52 +429,19 @@ public class Glfw {
 		return n;
 	}
 
-	private static native int glfwGetMonitorsJni(long[] monitors); /*
-		int count = 0;
-		GLFWmonitor** mons = glfwGetMonitors(&count);
-		if(!mons) return 0;
+	private static native int glfwGetMonitorsJni(long[] monitors);
 
-		for(int i = 0; i < count; i++) {
-			monitors[i] = (jlong)mons[i];
-		}
-		return count;
-	*/
+	public static native long glfwGetPrimaryMonitor();
 
-	public static native long glfwGetPrimaryMonitor(); /*
-		return (jlong)glfwGetPrimaryMonitor();
-	*/
+	public static native int glfwGetMonitorX(long monitor);
 
-	public static native int glfwGetMonitorX(long monitor); /*
-		int x = 0;
-		int y = 0;
-		glfwGetMonitorPos((GLFWmonitor*)monitor, &x, &y);
-		return x;
-	*/
+	public static native int glfwGetMonitorY(long monitor);
 
-	public static native int glfwGetMonitorY(long monitor); /*
-		int x = 0;
-		int y = 0;
-		glfwGetMonitorPos((GLFWmonitor*)monitor, &x, &y);
-		return y;
-	*/
+	public static native int glfwGetMonitorPhysicalWidth(long monitor);
 
-	public static native int glfwGetMonitorPhysicalWidth(long monitor); /*
-		int width = 0;
-		int height = 0;
-		glfwGetMonitorPhysicalSize((GLFWmonitor*)monitor, &width, &height);
-		return width;
-	*/
+	public static native int glfwGetMonitorPhysicalHeight(long monitor);
 
-	public static native int glfwGetMonitorPhysicalHeight(long monitor); /*
-		int width = 0;
-		int height = 0;
-		glfwGetMonitorPhysicalSize((GLFWmonitor*)monitor, &width, &height);
-		return height;
-	*/
-
-	public static native String glfwGetMonitorName(long monitor); /*
-		return env->NewStringUTF(glfwGetMonitorName((GLFWmonitor*)monitor));
-	*/
+	public static native String glfwGetMonitorName(long monitor);
 
 	public static List<GlfwVideoMode> glfwGetVideoModes(long monitor) {
 		int[] buffer = new int[5 * 256]; // 256 video modes are enough for everyone...
@@ -481,18 +459,7 @@ public class Glfw {
 		return modes;
 	}
 
-	private static native int glfwGetVideoModesJni(long monitor, int[] modes); /*
-		int numModes = 0;
-		const GLFWvidmode* vidModes = glfwGetVideoModes((GLFWmonitor*)monitor, &numModes);
-		for(int i = 0, j = 0; i < numModes; i++) {
-			modes[j++] = vidModes[i].width;
-			modes[j++] = vidModes[i].height;
-			modes[j++] = vidModes[i].redBits;
-			modes[j++] = vidModes[i].greenBits;
-			modes[j++] = vidModes[i].blueBits;
-		}
-		return numModes;
-	*/
+	private static native int glfwGetVideoModesJni(long monitor, int[] modes);
 
 	public static GlfwVideoMode glfwGetVideoMode(long monitor) {
 		int[] buffer = new int[5];
@@ -506,125 +473,51 @@ public class Glfw {
 		return mode;
 	}
 
-	private static native void glfwGetVideoModeJni(long monitor, int[] buffer); /*
-		GLFWvidmode mode = glfwGetVideoMode((GLFWmonitor*)monitor);
-		buffer[0] = mode.width;
-		buffer[1] = mode.height;
-		buffer[2] = mode.redBits;
-		buffer[3] = mode.greenBits;
-		buffer[4] = mode.blueBits;
-	*/
+	private static native void glfwGetVideoModeJni(long monitor, int[] buffer);
 
-	public static native void glfwSetGamma(long monitor, float gamma); /*
-		glfwSetGamma((GLFWmonitor*)monitor, gamma);
-	*/
+	public static native void glfwSetGamma(long monitor, float gamma);
 
-	public static native void glfwDefaultWindowHints(); /*
-		glfwDefaultWindowHints();
-	*/
+	public static native void glfwDefaultWindowHints();
 
-	public static native void glfwWindowHint(int target, int hint); /*
-		glfwWindowHint(target, hint);
-	*/
+	public static native void glfwWindowHint(int target, int hint);
 
 	public static long glfwCreateWindow(int width, int height, String title, long monitor, long share) {
 		return glfwCreateWindowJni(width, height, title == null ? "GLFW" : title, monitor, share);
 	}
 
-	private static native long glfwCreateWindowJni(int width, int height, String title, long monitor, long share); /*
-		GLFWwindow* window = glfwCreateWindow(width, height, title, (GLFWmonitor*)monitor, (GLFWwindow*)share);
-		if (window) {
-			glfwSetWindowPosCallback(window, windowPos);
-			glfwSetWindowSizeCallback(window, windowSize);
-			glfwSetWindowCloseCallback(window, windowClose);
-			glfwSetWindowRefreshCallback(window, windowRefresh);
-			glfwSetWindowFocusCallback(window, windowFocus);
-			glfwSetWindowIconifyCallback(window, windowIconify);
-			glfwSetKeyCallback(window, key);
-			glfwSetCharCallback(window, character);
-			glfwSetMouseButtonCallback(window, mouseButton);
-			glfwSetCursorPosCallback(window, cursorPos);
-			glfwSetCursorEnterCallback(window, cursorEnter);
-			glfwSetScrollCallback(window, scroll);
-		}
-		return (jlong)window;
-	*/
+	private static native long glfwCreateWindowJni(int width, int height, String title, long monitor, long share);
 
-	public static native void glfwDestroyWindow(long window); /*
-		glfwDestroyWindow((GLFWwindow*)window);
-	*/
+	public static native void glfwDestroyWindow(long window);
 
-	public static native boolean glfwWindowShouldClose(long window); /*
-		return GL_TRUE == glfwWindowShouldClose((GLFWwindow*)window);
-	*/
+	public static native boolean glfwWindowShouldClose(long window);
 
-	public static native void glfwSetWindowShouldClose(long window, int value); /*
-		glfwSetWindowShouldClose((GLFWwindow*)window, value);
-	*/
+	public static native void glfwSetWindowShouldClose(long window, int value);
 
-	public static native void glfwSetWindowTitle(long window, String title); /*
-		glfwSetWindowTitle((GLFWwindow*)window, title);
-	*/
+	public static native void glfwSetWindowTitle(long window, String title);
 
-	public static native void glfwSetWindowPos(long window,  int x, int y); /*
-		glfwSetWindowPos((GLFWwindow*)window, x, y);
-	*/
+	public static native void glfwSetWindowPos(long window,  int x, int y);
 
-	public static native int glfwGetWindowX(long window); /*
-		int x = 0;
-		int y = 0;
-		glfwGetWindowPos((GLFWwindow*)window, &x, &y);
-		return x;
-	*/
+	public static native int glfwGetWindowX(long window);
 
-	public static native int glfwGetWindowY(long window); /*
-		int x = 0;
-		int y = 0;
-		glfwGetWindowPos((GLFWwindow*)window, &x, &y);
-		return y;
-	*/
+	public static native int glfwGetWindowY(long window);
 
-	public static native int glfwGetWindowWidth(long window); /*
-		int width = 0;
-		int height = 0;
-		glfwGetWindowSize((GLFWwindow*)window, &width, &height);
-		return width;
-	*/
+	public static native int glfwGetWindowWidth(long window);
 
-	public static native int glfwGetWindowHeight(long window); /*
-		int width = 0;
-		int height = 0;
-		glfwGetWindowSize((GLFWwindow*)window, &width, &height);
-		return height;
-	*/
+	public static native int glfwGetWindowHeight(long window);
 
-	public static native void glfwSetWindowSize(long window, int width, int height); /*
-		glfwSetWindowSize((GLFWwindow*)window, width, height);
-	*/
+	public static native void glfwSetWindowSize(long window, int width, int height);
 
-	public static native void glfwIconifyWindow(long window); /*
-		glfwIconifyWindow((GLFWwindow*)window);
-	*/
+	public static native void glfwIconifyWindow(long window);
 
-	public static native void glfwRestoreWindow(long window); /*
-		glfwRestoreWindow((GLFWwindow*)window);
-	*/
+	public static native void glfwRestoreWindow(long window);
 
-	public static native void glfwHideWindow(long window); /*
-		glfwHideWindow((GLFWwindow*)window);
-	*/
+	public static native void glfwHideWindow(long window);
 
-	public static native void glfwShowWindow(long window); /*
-		glfwShowWindow((GLFWwindow*)window);
-	*/
+	public static native void glfwShowWindow(long window);
 
-	public static native long glfwGetWindowMonitor(long window); /*
-		return (jlong)glfwGetWindowMonitor((GLFWwindow*)window);
-	*/
+	public static native long glfwGetWindowMonitor(long window);
 
-	public static native int glfwGetWindowAttrib(long window, int param); /*
-		return glfwGetWindowAttrib((GLFWwindow*)window, param);
-	*/
+	public static native int glfwGetWindowAttrib(long window, int param);
 
 	/**
 	 * Sets the {@link GlfwCallback} that will get invoked by
@@ -635,170 +528,62 @@ public class Glfw {
 		glfwSetCallbackJni(callback);
 	}
 
-	public static native void glfwSetCallbackJni(GlfwCallback javaCallback); /*
-		if (callback) {
-			env->DeleteGlobalRef(callback);
-			callback = 0;
-		}
-		if (javaCallback) callback = env->NewGlobalRef(javaCallback);
-	*/
+	public static native void glfwSetCallbackJni(GlfwCallback javaCallback);
 
 	public static void glfwPollEvents() {
 		glfwPollEventsJni(callback);
 	}
 
-	private static native void glfwPollEventsJni(GlfwCallback javaCallback); /*
-		glfwPollEvents();
-	*/
+	private static native void glfwPollEventsJni(GlfwCallback javaCallback);
 
 	public static void glfwWaitEvents() {
 		glfwWaitEventsJni(callback);
 	}
 
-	private static native void glfwWaitEventsJni(GlfwCallback javaCallback); /*
-		glfwWaitEvents();
-	*/
+	private static native void glfwWaitEventsJni(GlfwCallback javaCallback);
 
-	public static native int glfwGetInputMode(long window, int mode); /*
-		return glfwGetInputMode((GLFWwindow*)window, mode);
-	*/
+	public static native int glfwGetInputMode(long window, int mode);
 
-	public static native void glfwSetInputMode(long window, int mode, int value); /*
-		glfwSetInputMode((GLFWwindow*)window, mode, value);
-	*/
+	public static native void glfwSetInputMode(long window, int mode, int value);
 
-	public static native int glfwGetKey(long window, int key); /*
-		return glfwGetKey((GLFWwindow*)window, key) == GLFW_PRESS;
-	*/
+	public static native int glfwGetKey(long window, int key);
 
-	public static native int glfwGetMouseButton(long window, int button); /*
-		return glfwGetMouseButton((GLFWwindow*)window, button) == GLFW_PRESS;
-	*/
+	public static native int glfwGetMouseButton(long window, int button);
 
-	public static native int glfwGetCursorPosX(long window); /*
-		int x = 0;
-		int y = 0;
-		glfwGetCursorPos((GLFWwindow*)window, &x, &y);
-		return x;
-	*/
+	public static native int glfwGetCursorPosX(long window);
 
-	public static native int glfwGetCursorPosY(long window); /*
-		int x = 0;
-		int y = 0;
-		glfwGetCursorPos((GLFWwindow*)window, &x, &y);
-		return y;
-	*/
+	public static native int glfwGetCursorPosY(long window);
 
-	public static native void glfwSetCursorPos(long window, int x, int y); /*
-		glfwSetCursorPos((GLFWwindow*)window, x, y);
-	*/
+	public static native void glfwSetCursorPos(long window, int x, int y);
 
-	public static native int glfwGetJoystickParam(int joy, int param); /*
-		return glfwGetJoystickParam(joy, param);
-	*/
+	public static native int glfwGetJoystickParam(int joy, int param);
 
-	public static native int glfwGetJoystickAxes(int joy, float[] axes); /*
-		return glfwGetJoystickAxes(joy, axes, env->GetArrayLength(obj_axes));
-	*/
+	public static native int glfwGetJoystickAxes(int joy, float[] axes);
 
-	public static native int glfwGetJoystickButtons(int joy, byte[] buttons); /*
-		return glfwGetJoystickButtons(joy, (unsigned char*)buttons, env->GetArrayLength(obj_buttons));
-	*/
+	public static native int glfwGetJoystickButtons(int joy, byte[] buttons);
 
-	public static native String glfwGetJoystickName(int joy); /*
-		return env->NewStringUTF(glfwGetJoystickName(joy));
-	*/
+	public static native String glfwGetJoystickName(int joy);
 
-	public static native void glfwSetClipboardString(long window, String string); /*
-		glfwSetClipboardString((GLFWwindow*)window, string);
-	*/
+	public static native void glfwSetClipboardString(long window, String string);
 
-	public static native String glfwGetClipboardString(long window); /*
-		return env->NewStringUTF(glfwGetClipboardString((GLFWwindow*)window));
-	*/
+	public static native String glfwGetClipboardString(long window);
 
-	public static native double glfwGetTime(); /*
-		return glfwGetTime();
-	*/
+	public static native double glfwGetTime();
 
-	public static native void glfwSetTime(double time); /*
-		glfwSetTime(time);
-	*/
+	public static native void glfwSetTime(double time);
 
 	public static void glfwMakeContextCurrent(long window) {
 		glfwMakeContextCurrentJni(window);
-		//GL.init();
 	}
 
-	private static native void glfwMakeContextCurrentJni(long window); /*
-		glfwMakeContextCurrent((GLFWwindow*)window);
-	*/
+	private static native void glfwMakeContextCurrentJni(long window);
 
-	public static native long glfwGetCurrentContext(); /*
-		return (jlong)glfwGetCurrentContext();
-	*/
+	public static native long glfwGetCurrentContext();
 
-	public static native void glfwSwapBuffers(long window); /*
-		glfwSwapBuffers((GLFWwindow*)window);
-	*/
+	public static native void glfwSwapBuffers(long window);
 
-	public static native void glfwSwapInterval(int interval); /*
-		glfwSwapInterval(interval);
-	*/
+	public static native void glfwSwapInterval(int interval);
 
-	public static native boolean glfwExtensionSupported(String extension); /*
-		return glfwExtensionSupported(extension) == GL_TRUE;
-	*/
+	public static native boolean glfwExtensionSupported(String extension);
 
-	// Not used in JAva
-//	private static native void glfwSetWindowUserPointer(); /*
-//	*/
-//
-//	private static native void glfwGetWindowUserPointer(); /*
-//	*/
-//
-
-	// These are all callback functions that are replaced by
-	// glfwSetCallback();
-//	public static native void glfwSetErrorCallback(); /*
-//	 */
-//
-//	public static native void glfwSetMonitorCallback(); /*
-//	*/
-//
-//	private static native void glfwSetWindowPosCallback(); /*
-//	*/
-//
-//	private static native void glfwSetWindowSizeCallback(); /*
-//	*/
-//
-//	private static native void glfwSetWindowCloseCallback(); /*
-//	*/
-//
-//	private static native void glfwSetWindowRefreshCallback(); /*
-//	*/
-//
-//	private static native void glfwSetWindowFocusCallback(); /*
-//	*/
-//
-//	private static native void glfwSetWindowIconifyCallback(); /*
-//	*/
-//
-//	private static native void glfwSetKeyCallback(); /*
-//	*/
-//
-//	private static native void glfwSetCharCallback(); /*
-//	*/
-//
-//	private static native void glfwSetMouseButtonCallback(); /*
-//	*/
-//
-//	private static native void glfwSetCursorPosCallback(); /*
-//	*/
-//
-//	private static native void glfwSetCursorEnterCallback(); /*
-//	*/
-//
-//	private static native void glfwSetScrollCallback(); /*
-//	*/
 }
