@@ -15,12 +15,18 @@
 	static jmethodID windowRefreshId = 0;
 	static jmethodID windowFocusId = 0;
 	static jmethodID windowIconifyId = 0;
+  static jmethodID windowMaximizeId = 0;
+  static jmethodID windowFrameBufferId = 0;
+  static jmethodID windowContentScaleId = 0;
 	static jmethodID keyId = 0;
 	static jmethodID characterId = 0;
+  static jmethodID characterModsId = 0;
 	static jmethodID mouseButtonId = 0;
 	static jmethodID cursorPosId = 0;
 	static jmethodID cursorEnterId = 0;
+	static jmethodID dropId = 0;
 	static jmethodID scrollId = 0;
+  static jmethodID joyId = 0;
 
   #ifndef _WIN32
 	#include <pthread.h>
@@ -102,15 +108,33 @@
 
 	void windowFocus(GLFWwindow* window, int focused) {
 		if(callback) {
-			getEnv()->CallVoidMethod(callback, windowFocusId, (jlong)window, (jboolean)(GL_TRUE==focused));
+			getEnv()->CallVoidMethod(callback, windowFocusId, (jlong)window, (jboolean)(GLFW_TRUE==focused));
 		}
 	}
 
 	void windowIconify(GLFWwindow* window, int iconified) {
 		if(callback) {
-			getEnv()->CallVoidMethod(callback, windowIconifyId, (jlong)window, (jboolean)(GL_TRUE==iconified));
+			getEnv()->CallVoidMethod(callback, windowIconifyId, (jlong)window, (jboolean)(GLFW_TRUE==iconified));
 		}
 	}
+
+  void windowMaximize(GLFWwindow* window, int maximized) {
+    if (callback) {
+      getEnv()->CallVoidMethod(callback, windowMaximizeId, (jlong)window, (jboolean)(GLFW_TRUE==maximized));
+    }
+  }
+
+  void windowFramebufferSize(GLFWwindow* window, int width, int height) {
+    if (callback) {
+      getEnv()->CallVoidMethod(callback, windowFrameBufferId, (jlong)window, (jint)width, (jint)height);
+    }
+  }
+
+  void windowContentScale(GLFWwindow* window, float xScale, float yScale) {
+    if (callback) {
+      getEnv()->CallVoidMethod(callback, windowContentScaleId, (jlong)window, (jfloat)xScale, (jfloat)yScale);
+    }
+  }
 
 	void mouseButton(GLFWwindow* window, int button, int action, int mods) {
 		if(callback) {
@@ -145,15 +169,37 @@
 		}
 	}
 
-	void character(GLFWwindow* window, unsigned int character) {
+	void character(GLFWwindow* window, unsigned int codepoint) {
 		if(callback) {
-			getEnv()->CallVoidMethod(callback, characterId, (jlong)window, (jchar)character);
+			getEnv()->CallVoidMethod(callback, characterId, (jlong)window, (jint)codepoint);
 		}
 	}
+
+  void characterMods(GLFWwindow* window, unsigned int charpoint, int mods) {
+    if(callback) {
+			getEnv()->CallVoidMethod(callback, characterModsId, (jlong)window, (jint)charpoint, (jint)mods);
+		}
+  }
+
+  void drop(GLFWwindow* window, int path_count, const char* paths[]) {
+    if(callback) {
+      JNIEnv* env = getEnv();
+      jobjectArray paths_arr = env->NewObjectArray(path_count, env->FindClass("java/lang/String"), 0);
+      for (int i = 0; i < path_count; i++) {
+        env->SetObjectArrayElement(paths_arr, i, env->NewStringUTF(paths[i]));
+      }
+			env->CallVoidMethod(callback, dropId, (jlong)window, paths_arr);
+		}
+  }
 
 	void monitor(GLFWmonitor* monitor, int event) {
 		if(callback) {
 			getEnv()->CallVoidMethod(callback, monitorId, (jlong)monitor, (jboolean)(GLFW_CONNECTED==event));
+		}
+	}
+  void joystick(int jid, int event) {
+		if(callback) {
+			getEnv()->CallVoidMethod(callback, joyId, (jint) jid, (jint)event);
 		}
 	}
 
@@ -235,7 +281,7 @@ JNIEXPORT jboolean JNICALL Java_io_github_jaquobia_Glfw_glfwInit
 			}
 		}
 
-		characterId = env->GetMethodID(callbackClass, "character", "(JC)V");
+		characterId = env->GetMethodID(callbackClass, "character", "(JI)V");
 		if(!characterId) {
 			env->ThrowNew(exception, "Couldn't find character() method");
 			return false;
@@ -265,6 +311,36 @@ JNIEXPORT jboolean JNICALL Java_io_github_jaquobia_Glfw_glfwInit
 			return false;
 		}
 
+    windowMaximizeId = env->GetMethodID(callbackClass, "windowMaximize", "(JZ)V");
+		if(!windowMaximizeId) {
+			env->ThrowNew(exception, "Couldn't find windowMaximize() method");
+			return false;
+		}
+    windowFrameBufferId = env->GetMethodID(callbackClass, "windowFramebufferSize", "(JII)V");
+		if(!windowFrameBufferId) {
+			env->ThrowNew(exception, "Couldn't find windowFramebufferSize() method");
+			return false;
+		}
+    windowContentScaleId = env->GetMethodID(callbackClass, "windowContentScale", "(JFF)V");
+		if(!windowContentScaleId) {
+			env->ThrowNew(exception, "Couldn't find windowContentScale() method");
+			return false;
+		}
+    characterModsId = env->GetMethodID(callbackClass, "characterMods", "(JII)V");
+		if(!characterModsId) {
+			env->ThrowNew(exception, "Couldn't find characterMods() method");
+			return false;
+		}
+    dropId = env->GetMethodID(callbackClass, "drop", "(J[Ljava/lang/String;)V");
+		if(!dropId) {
+			env->ThrowNew(exception, "Couldn't find drop() method");
+			return false;
+		}
+    joyId = env->GetMethodID(callbackClass, "joystick", "(II)V");
+		if(!joyId) {
+			env->ThrowNew(exception, "Couldn't find joystick() method");
+			return false;
+		}
 		jboolean result = glfwInit() == GL_TRUE;
 		if(result) {
 			glfwSetErrorCallback(error);
@@ -464,7 +540,6 @@ JNIEXPORT void JNICALL Java_io_github_jaquobia_Glfw_glfwDefaultWindowHints
 JNIEXPORT void JNICALL Java_io_github_jaquobia_Glfw_glfwWindowHint
   (JNIEnv *env, jclass clazz, jint hint, jint value)
   {
-    std::cout << "Hint: " << hint << ", Value: " << value << std::endl;
     glfwWindowHint((int) hint, (int) value);
   }
 
@@ -477,7 +552,6 @@ JNIEXPORT jlong JNICALL Java_io_github_jaquobia_Glfw_glfwCreateWindowJni
   (JNIEnv *env, jclass clazz, jint width, jint height, jstring title, jlong monitor, jlong share)
   {
     jclass exception = env->FindClass("java/lang/Exception");
-    std::cout << "JNI Attempting to make glfw Window\n";
     auto ctitle = env->GetStringUTFChars(title, 0);
     auto window = glfwCreateWindow((int) width, (int) height, ctitle, (GLFWmonitor*)monitor, (GLFWwindow*)share);
     if (window) {
@@ -493,7 +567,12 @@ JNIEXPORT jlong JNICALL Java_io_github_jaquobia_Glfw_glfwCreateWindowJni
 			glfwSetCursorPosCallback(window, cursorPos);
 			glfwSetCursorEnterCallback(window, cursorEnter);
 			glfwSetScrollCallback(window, scroll);
-      // std::cout << "Successfutlly made a window!\n";
+      glfwSetWindowMaximizeCallback(window, windowMaximize);
+      glfwSetFramebufferSizeCallback(window, windowFramebufferSize);
+      glfwSetWindowContentScaleCallback(window, windowContentScale);
+      glfwSetCharModsCallback(window, characterMods);
+      glfwSetDropCallback(window, drop);
+      glfwSetJoystickCallback(joystick);
     } else {
       env->ThrowNew(exception, "JNI Window could not be created!\n");
     }
@@ -752,10 +831,10 @@ JNIEXPORT void JNICALL Java_io_github_jaquobia_Glfw_glfwSetInputMode
  * Method:    glfwGetKey
  * Signature: (JI)Z
  */
-JNIEXPORT jboolean JNICALL Java_io_github_jaquobia_Glfw_glfwGetKey
+JNIEXPORT jint JNICALL Java_io_github_jaquobia_Glfw_glfwGetKey
   (JNIEnv *env, jclass clazz, jlong window, jint key)
   {
-    return (jboolean)glfwGetKey((GLFWwindow*) window, (int) key);
+    return (jint)glfwGetKey((GLFWwindow*) window, (int) key);
   }
 
 /*
@@ -763,10 +842,10 @@ JNIEXPORT jboolean JNICALL Java_io_github_jaquobia_Glfw_glfwGetKey
  * Method:    glfwGetMouseButton
  * Signature: (JI)Z
  */
-JNIEXPORT jboolean JNICALL Java_io_github_jaquobia_Glfw_glfwGetMouseButton
+JNIEXPORT jint JNICALL Java_io_github_jaquobia_Glfw_glfwGetMouseButton
   (JNIEnv *env, jclass clazz, jlong window, jint button)
   {
-    return (jboolean)glfwGetMouseButton((GLFWwindow*) window, (int) button);
+    return (jint)glfwGetMouseButton((GLFWwindow*) window, (int) button);
   }
 
 /*

@@ -37,13 +37,9 @@ public class Main {
 
     public static GlfwCallback getCallback() {
         return new GlfwCallback() {
+
             @Override
             public void error(int error, String description) {
-
-            }
-
-            @Override
-            public void monitor(long monitor, boolean connected) {
 
             }
 
@@ -54,12 +50,12 @@ public class Main {
 
             @Override
             public void windowSize(long window, int width, int height) {
-                logger.fine("Window Size: " + width + " " + height);
+
             }
 
             @Override
             public void windowClose(long window) {
-                logger.fine("Window Close");
+
             }
 
             @Override
@@ -78,12 +74,17 @@ public class Main {
             }
 
             @Override
-            public void key(long window, int key, int scancode, int action, int mods) {
+            public void windowMaximize(long window, boolean maximized) {
 
             }
 
             @Override
-            public void character(long window, char character) {
+            public void windowFramebufferSize(long window, int width, int height) {
+
+            }
+
+            @Override
+            public void windowContentScale(long window, float xScale, float yScale) {
 
             }
 
@@ -104,6 +105,38 @@ public class Main {
 
             @Override
             public void scroll(long window, double scrollX, double scrollY) {
+
+            }
+
+            @Override
+            public void key(long window, int key, int scancode, int action, int mods) {
+
+            }
+
+            @Override
+            public void character(long window, int codepoint) {
+
+            }
+
+            @Override
+            public void characterMods(long window, int codepoint, int mods) {
+
+            }
+
+            @Override
+            public void drop(long window, String[] paths) {
+                for (String path : paths) {
+                    System.out.println(path);
+                }
+            }
+
+            @Override
+            public void monitor(long monitor, boolean connected) {
+
+            }
+
+            @Override
+            public void joystick(int jid, int event) {
 
             }
         };
