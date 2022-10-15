@@ -7,12 +7,17 @@ Named as frankin from frankenstein (yes its mispelled), since its a cursed port 
 # Why was this made?
 I wanted to try rewriting minecraft b1.7.3 to use glfw instead of java applets, but came across the issue that b1.7.3 was written in lwjgl2, which had no glfw.  
 When looking for a java glfw library, all I could find was lwjgl3 (which can't load beside lwjgl2) and jglfw (which is mightily outdated)
-#Including in project
+# Including in project
 ```gradle
-implementation 'com.github.jaquobia:frankinglfw:v1.3.3'
+repositories {
+    maven { url "https://jitpack.io" }
+}
+dependencies {
+    implementation 'com.github.jaquobia:frankinglfw:v1.3.3'
+}
 ```
 # Using this with JOGL
-```java   
+```java
 Glfw.glfwMakeContextCurrent(window);
 GLContext glContext = GLDrawableFactory.getFactory(GLProfile.get(GLProfile.GL3)).createExternalGLContext();
 if (!glContext.isCurrent())
