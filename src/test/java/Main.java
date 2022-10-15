@@ -1,10 +1,16 @@
 import com.jogamp.opengl.*;
 import io.github.jaquobia.Glfw;
 import io.github.jaquobia.GlfwCallback;
+import org.junit.jupiter.api.Test;
 
 public class Main {
-
     public static void main(String[] args) {
+        new Main().runTests();
+    }
+
+
+    @Test
+    public void runTests() {
         Glfw.glfwInit();
         Glfw.glfwDefaultWindowHints();
         GlfwCallback callback = getCallback();
@@ -30,6 +36,7 @@ public class Main {
             Glfw.glfwSwapBuffers(window);
         }
         glContext.destroy();
+
     }
 
     public static GlfwCallback getCallback() {

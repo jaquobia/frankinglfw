@@ -8,8 +8,8 @@ public class Glfw {
 	/**
 	 * Practically sto.. *cough* copied from mc b1.7.3
 	 * @param libName name of the library
-	 * @param libPrefix if lib should be prefixed to the libname for unix
-	 * @param macLibPrefix if lib should be prefixed to the libname for mac
+	 * @param libPrefix if lib should be prefixed to the libname for unix, 99% of the time this will be true
+	 * @param macLibPrefix if lib should be prefixed to the libname for mac, useful for bundles
 	 * @param macDylib if .dylib should be used for mac, .so otherwise
 	 * @return a true name for the library based on the OS
 	 */
