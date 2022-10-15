@@ -378,6 +378,17 @@ JNIEXPORT jstring JNICALL Java_io_github_jaquobia_Glfw_glfwGetVersionString
     return env->NewStringUTF(glfwGetVersionString());
   }
 
+JNIEXPORT jint JNICALL Java_io_github_jaquobia_Glfw_glfwGetPlatform
+  (JNIEnv *env, jclass clazz)
+  {
+    return (jint)glfwGetPlatform();
+  }
+JNIEXPORT jboolean JNICALL Java_io_github_jaquobia_Glfw_glfwPlatformSupported
+  (JNIEnv *env, jclass clazz, jint platform)
+  {
+    return (jboolean)(glfwPlatformSupported((int)platform) == GLFW_TRUE);
+  }
+
 /*
  * Class:     Glfw
  * Method:    glfwGetMonitorsJni
@@ -433,6 +444,35 @@ JNIEXPORT jint JNICALL Java_io_github_jaquobia_Glfw_glfwGetMonitorY
     return y;
   }
 
+JNIEXPORT jint JNICALL Java_io_github_jaquobia_Glfw_glfwGetMonitorWorkX
+  (JNIEnv *, jclass, jlong)
+  {
+    int x = 0, y = 0, width = 0, height = 0;
+    glfwGetMonitorWorkarea((GLFWmonitor*)monitor, &x, &y, &width, &height);
+    return x;
+  }
+JNIEXPORT jint JNICALL Java_io_github_jaquobia_Glfw_glfwGetMonitorWorkY
+  (JNIEnv *, jclass, jlong)
+  {
+    int x = 0, y = 0, width = 0, height = 0;
+    glfwGetMonitorWorkarea((GLFWmonitor*)monitor, &x, &y, &width, &height);
+    return y;
+  }
+JNIEXPORT jint JNICALL Java_io_github_jaquobia_Glfw_glfwGetMonitorWorkWidth
+  (JNIEnv *, jclass, jlong)
+  {
+    int x = 0, y = 0, width = 0, height = 0;
+    glfwGetMonitorWorkarea((GLFWmonitor*)monitor, &x, &y, &width, &height);
+    return width;
+  }
+JNIEXPORT jint JNICALL Java_io_github_jaquobia_Glfw_glfwGetMonitorWorkHeight
+  (JNIEnv *, jclass, jlong)
+  {
+    int x = 0, y = 0, width = 0, height = 0;
+    glfwGetMonitorWorkarea((GLFWmonitor*)monitor, &x, &y, &width, &height);
+    return height;
+  }
+
 /*
  * Class:     Glfw
  * Method:    glfwGetMonitorPhysicalWidth
@@ -456,6 +496,22 @@ JNIEXPORT jint JNICALL Java_io_github_jaquobia_Glfw_glfwGetMonitorPhysicalHeight
   {
     int width, height = 0;
     glfwGetMonitorPhysicalSize((GLFWmonitor*)monitor, &width, &height);
+    return height;
+  }
+
+
+JNIEXPORT jfloat JNICALL Java_io_github_jaquobia_Glfw_glfwGetMonitorScaleX
+  (JNIEnv *, jclass, jlong)
+  {
+    float width = 0, height = 0;
+    glfwGetMonitorContentScale((GLFWmonitor*)monitor, &width, &height);
+    return width;
+  }
+JNIEXPORT jfloat JNICALL Java_io_github_jaquobia_Glfw_glfwGetMonitorScaleY
+  (JNIEnv *, jclass, jlong)
+  {
+    float width = 0, height = 0;
+    glfwGetMonitorContentScale((GLFWmonitor*)monitor, &width, &height);
     return height;
   }
 
@@ -541,6 +597,14 @@ JNIEXPORT void JNICALL Java_io_github_jaquobia_Glfw_glfwWindowHint
   (JNIEnv *env, jclass clazz, jint hint, jint value)
   {
     glfwWindowHint((int) hint, (int) value);
+  }
+
+  JNIEXPORT void JNICALL Java_io_github_jaquobia_Glfw_glfwWindowHintString
+  (JNIEnv *env, jclass clazz, jint hint, jstring value)
+  {
+    auto cvalue = env->GetStringUTFChars(value, 0);
+    glfwWindowHintString((int)hint, cvalue);
+    env->ReleaseStringUTFChars(value, cvalue);
   }
 
 /*
@@ -700,6 +764,12 @@ JNIEXPORT void JNICALL Java_io_github_jaquobia_Glfw_glfwSetWindowSize
     glfwSetWindowSize((GLFWwindow*) window, (int) width, (int) height);
   }
 
+JNIEXPORT void JNICALL Java_io_github_jaquobia_Glfw_glfwSetWindowSizeLimits
+  (JNIEnv *env, jclass clazz, jlong window, jint x, jint y, jint width, jint height)
+  {
+    glfwSetWindowSizeLimits((GLFWwindow*)window, (int)x, (int)y, (int)width, (int)height);
+  }
+
 /*
  * Class:     Glfw
  * Method:    glfwIconifyWindow
@@ -710,6 +780,25 @@ JNIEXPORT void JNICALL Java_io_github_jaquobia_Glfw_glfwIconifyWindow
   {
     glfwIconifyWindow((GLFWwindow*) window);
   }
+
+JNIEXPORT void JNICALL Java_io_github_jaquobia_Glfw_glfwSetWindowAspectRatio
+  (JNIEnv *env, jclass clazz, jlong window, jint num, jint denom)
+  {
+    glfwSetWindowAspectRatio((GLFWwindow*)window, (int)num, (int)denom);
+  }
+
+JNIEXPORT jfloat JNICALL Java_io_github_jaquobia_Glfw_glfwGetWindowOpacity
+  (JNIEnv *env, jclass clazz, jlong window)
+  {
+    return (jfloat)glfwGetWindowOpacity((GLFWwindow*)window);
+  }
+
+JNIEXPORT void JNICALL Java_io_github_jaquobia_Glfw_glfwSetWindowOpacity
+  (JNIEnv *env, jclass clazz, jlong window, jfloat opacity)
+  {
+    glfwSetWindowOpacity((GLFWwindow*)window, (float)opacity);
+  }
+
 
 /*
  * Class:     Glfw
@@ -733,6 +822,12 @@ JNIEXPORT void JNICALL Java_io_github_jaquobia_Glfw_glfwHideWindow
     glfwHideWindow((GLFWwindow*) window);
   }
 
+JNIEXPORT void JNICALL Java_io_github_jaquobia_Glfw_glfwMaximizeWindow
+  (JNIEnv *env, jclass clazz, jlong window)
+  {
+    glfwMaximizeWindow((GLFWwindow*) window);
+  }
+
 /*
  * Class:     Glfw
  * Method:    glfwShowWindow
@@ -744,6 +839,18 @@ JNIEXPORT void JNICALL Java_io_github_jaquobia_Glfw_glfwShowWindow
     glfwShowWindow((GLFWwindow*) window);
   }
 
+JNIEXPORT void JNICALL Java_io_github_jaquobia_Glfw_glfwFocusWindow
+  (JNIEnv *env, jclass clazz, jlong window)
+  {
+    glfwFocusWindow((GLFWwindow*) window);
+  }
+
+JNIEXPORT void JNICALL Java_io_github_jaquobia_Glfw_glfwRequestWindowAttention
+  (JNIEnv *env, jclass clazz, jlong window)
+  {
+    glfwRequestWindowAttention((GLFWwindow*) window);
+  }
+
 /*
  * Class:     Glfw
  * Method:    glfwGetWindowMonitor
@@ -752,9 +859,80 @@ JNIEXPORT void JNICALL Java_io_github_jaquobia_Glfw_glfwShowWindow
 JNIEXPORT jlong JNICALL Java_io_github_jaquobia_Glfw_glfwGetWindowMonitor
   (JNIEnv *env, jclass clazz, jlong window)
   {
-    auto monitor = glfwGetWindowMonitor((GLFWwindow*) window);
-    return (jlong) monitor;
+    return (jlong) glfwGetWindowMonitor((GLFWwindow*) window);
   }
+
+static int mini(int x, int y)
+{
+    return x < y ? x : y;
+}
+
+static int maxi(int x, int y)
+{
+    return x > y ? x : y;
+}
+
+GLFWmonitor* get_current_monitor(GLFWwindow *window)
+{
+    int nmonitors, i;
+    int wx, wy, ww, wh;
+    int mx, my, mw, mh;
+    int overlap, bestoverlap;
+    GLFWmonitor *bestmonitor;
+    GLFWmonitor **monitors;
+    const GLFWvidmode *mode;
+
+    bestoverlap = 0;
+    bestmonitor = NULL;
+
+    glfwGetWindowPos(window, &wx, &wy);
+    glfwGetWindowSize(window, &ww, &wh);
+    monitors = glfwGetMonitors(&nmonitors);
+
+    for (i = 0; i < nmonitors; i++) {
+        mode = glfwGetVideoMode(monitors[i]);
+        glfwGetMonitorPos(monitors[i], &mx, &my);
+        mw = mode->width;
+        mh = mode->height;
+
+        overlap =
+            maxi(0, mini(wx + ww, mx + mw) - maxi(wx, mx)) *
+            maxi(0, mini(wy + wh, my + mh) - maxi(wy, my));
+
+        if (bestoverlap < overlap) {
+            bestoverlap = overlap;
+            bestmonitor = monitors[i];
+        }
+    }
+
+    return bestmonitor;
+}
+JNIEXPORT jlong JNICALL Java_io_github_jaquobia_Glfw_glfwGetCurrentWindowMonitor
+  (JNIEnv *env, jclass clazz, jlong window)
+  {
+    return (jlong) get_current_monitor((GLFWwindow*) window);
+  }
+JNIEXPORT void JNICALL Java_io_github_jaquobia_Glfw_glfwSetCurrentWindowMonitor
+  (JNIEnv *env, jclass clazz, jlong window)
+  {
+    auto monitor = get_current_monitor((GLFWwindow*) window);
+    auto mode = glfwGetVideoMode((GLFWmonitor*)monitor);
+    glfwSetWindowMonitor((GLFWwindow*)window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+  }
+
+JNIEXPORT void JNICALL Java_io_github_jaquobia_Glfw_glfwSetWindowMonitor
+  (JNIEnv *env, jclass clazz, jlong window, jlong monitor, jint x, jint y, jint width, jint height, jint refresh)
+  {
+    glfwSetWindowMonitor((GLFWwindow*)window, (GLFWmonitor*)monitor, x, y, width, height, refresh);
+  }
+JNIEXPORT void JNICALL Java_io_github_jaquobia_Glfw_glfwSetWindowMonitorDefault
+  (JNIEnv *env, jclass clazz, jlong window, jlong monitor)
+  {
+    auto mode = glfwGetVideoMode((GLFWmonitor*)monitor);
+    glfwSetWindowMonitor((GLFWwindow*)window, (GLFWmonitor*)monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+  }
+
+
 
 /*
  * Class:     Glfw
@@ -765,6 +943,12 @@ JNIEXPORT jint JNICALL Java_io_github_jaquobia_Glfw_glfwGetWindowAttrib
   (JNIEnv *env, jclass clazz, jlong window, jint attribute)
   {
     return (jint)glfwGetWindowAttrib((GLFWwindow*)window, (int) attribute);
+  }
+
+JNIEXPORT void JNICALL Java_io_github_jaquobia_Glfw_glfwSetWindowAttrib
+  (JNIEnv *env, jclass clazz, jlong window, jint key, jint value)
+  {
+    glfwSetWindowAttrib((GLFWwindow*)window, key, value);
   }
 
 /*
@@ -788,7 +972,7 @@ JNIEXPORT void JNICALL Java_io_github_jaquobia_Glfw_glfwSetCallbackJni
  * Signature: (LGlfwCallback;)V
  */
 JNIEXPORT void JNICALL Java_io_github_jaquobia_Glfw_glfwPollEventsJni
-  (JNIEnv *env, jclass clazz, jobject)
+  (JNIEnv *env, jclass clazz, jobject obj)
   {
     glfwPollEvents();
   }
@@ -799,9 +983,16 @@ JNIEXPORT void JNICALL Java_io_github_jaquobia_Glfw_glfwPollEventsJni
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_io_github_jaquobia_Glfw_glfwWaitEventsJni
-  (JNIEnv *env, jclass clazz)
+  (JNIEnv *env, jclass clazz, jobject obj)
   {
     glfwWaitEvents();
+  }
+
+
+JNIEXPORT void JNICALL Java_io_github_jaquobia_Glfw_glfwWaitEventsTimeoutJni
+  (JNIEnv *env, jclass clazz, jdouble timeout)
+  {
+    glfwWaitEventsTimeout(timeout);
   }
 
 /*
@@ -813,6 +1004,18 @@ JNIEXPORT jint JNICALL Java_io_github_jaquobia_Glfw_glfwGetInputMode
   (JNIEnv *env, jclass clazz, jlong window, jint mode)
   {
     return (jint) glfwGetInputMode((GLFWwindow*) window, (int) mode);
+  }
+
+JNIEXPORT jstring JNICALL Java_io_github_jaquobia_Glfw_glfwGetKeyName
+  (JNIEnv *env, jclass clazz, jint key, jint scancode)
+  {
+    auto keyName = glfwGetKeyName(key, scancode);
+    return env->NewStringUTF(keyName);
+  }
+JNIEXPORT jint JNICALL Java_io_github_jaquobia_Glfw_glfwGetScancode
+  (JNIEnv *env, jclass clazz, jint key)
+  {
+    return glfwGetKeyScancode(key);
   }
 
 /*

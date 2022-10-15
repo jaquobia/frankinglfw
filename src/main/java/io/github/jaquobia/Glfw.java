@@ -415,11 +415,17 @@ public class Glfw {
 
 	public static native void glfwTerminate();
 
+	// Some ini functions go here, alloc and hints
+
 	public static String glfwGetVersion() {
-		return "3.4.0";
+		return glfwGetVersionString();
 	}
 
-	public static native String glfwGetVersionString();
+	private static native String glfwGetVersionString();
+
+
+	public static native int glfwGetPlatform();
+	public static native boolean glfwPlatformSupported(int platform);
 
 	public static long[] glfwGetMonitors() {
 		long[] monitors = new long[256]; // 256 monitors are enough for everyone...
@@ -437,9 +443,17 @@ public class Glfw {
 
 	public static native int glfwGetMonitorY(long monitor);
 
+	public static native int glfwGetMonitorWorkX(long monitor);
+	public static native int glfwGetMonitorWorkY(long monitor);
+	public static native int glfwGetMonitorWorkWidth(long monitor);
+	public static native int glfwGetMonitorWorkHeight(long monitor);
+
 	public static native int glfwGetMonitorPhysicalWidth(long monitor);
 
 	public static native int glfwGetMonitorPhysicalHeight(long monitor);
+
+	public static native float glfwGetMonitorScaleX(long monitor);
+	public static native float glfwGetMonitorScaleY(long monitor);
 
 	public static native String glfwGetMonitorName(long monitor);
 
@@ -477,9 +491,12 @@ public class Glfw {
 
 	public static native void glfwSetGamma(long monitor, float gamma);
 
+	// Get and Set Gamme Ramp
+
 	public static native void glfwDefaultWindowHints();
 
 	public static native void glfwWindowHint(int target, int hint);
+	public static native void glfwWindowHintString(int target, String hint);
 
 	public static long glfwCreateWindow(int width, int height, String title, long monitor, long share) {
 		return glfwCreateWindowJni(width, height, title == null ? "GLFW" : title, monitor, share);
@@ -495,7 +512,10 @@ public class Glfw {
 
 	public static native void glfwSetWindowTitle(long window, String title);
 
+	// Set Window Icon
+
 	public static native void glfwSetWindowPos(long window,  int x, int y);
+
 
 	public static native int glfwGetWindowX(long window);
 
@@ -507,17 +527,39 @@ public class Glfw {
 
 	public static native void glfwSetWindowSize(long window, int width, int height);
 
+	public static native void glfwSetWindowSizeLimits(long window, int minWidth, int minHeight, int maxWidth, int maxHeight);
+
+	public static native void glfwSetWindowAspectRatio(long window, int numerator, int denominator);
+
+	public static native float glfwGetWindowOpacity(long window);
+
+	public static native void glfwSetWindowOpacity(long window, float opacity);
+
 	public static native void glfwIconifyWindow(long window);
 
 	public static native void glfwRestoreWindow(long window);
 
 	public static native void glfwHideWindow(long window);
 
+	public static native void glfwMaximizeWindow(long window);
+
 	public static native void glfwShowWindow(long window);
+
+	public static native void glfwFocusWindow(long window);
+
+	public static native void glfwRequestWindowAttention(long window);
 
 	public static native long glfwGetWindowMonitor(long window);
 
+	public static native long glfwGetCurrentWindowMonitor(long window);
+	public static native void glfwSetCurrentWindowMonitor(long window);
+
+	public static native void glfwSetWindowMonitor(long window, long monitor, int x, int y, int width, int height, int refreshRate);
+	// Same as above, but uses the values of the monitor
+	public static native void glfwSetWindowMonitorDefault(long window, long monitor);
+
 	public static native int glfwGetWindowAttrib(long window, int param);
+	public static native void glfwSetWindowAttrib(long window, int param, int value);
 
 	/**
 	 * Sets the {@link GlfwCallback} that will get invoked by
@@ -542,9 +584,20 @@ public class Glfw {
 
 	private static native void glfwWaitEventsJni(GlfwCallback javaCallback);
 
+	public static void glfwWaitEventsTimeout(double timeout) {
+		glfwWaitEventsTimeoutJni(timeout);
+	}
+
+	private static native void glfwWaitEventsTimeoutJni(double timeout);
+
 	public static native int glfwGetInputMode(long window, int mode);
 
 	public static native void glfwSetInputMode(long window, int mode, int value);
+
+	// raw motion
+
+	public static native String glfwGetKeyName(int key, int scancode);
+	public static native int glfwGetScancode(int key);
 
 	public static native int glfwGetKey(long window, int key);
 
@@ -555,6 +608,8 @@ public class Glfw {
 	public static native int glfwGetCursorPosY(long window);
 
 	public static native void glfwSetCursorPos(long window, int x, int y);
+
+	// Set custom cursor?
 
 	public static native int glfwGetJoystickParam(int joy, int param);
 
