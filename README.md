@@ -1,4 +1,5 @@
 [![](https://jitpack.io/v/jaquobia/frankinglfw.svg)](https://jitpack.io/#jaquobia/frankinglfw)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/jaquobia/frankinglfw/Java%20CI%20with%20Gradle)
 
 # frankinglfw
 A cursed port of [JGLFW](https://github.com/badlogic/jglfw) to modern [glfw](https://github.com/glfw/glfw) 3.4  
