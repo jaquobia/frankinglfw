@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.github.jaquobia'
-version 'v1.3.2'
+version 'v1.3.3'
 
 repositories {
     mavenCentral()
@@ -28,4 +28,16 @@ test {
 artifacts {
     archives sourcesJar
     archives jar
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = group
+            artifactId = name
+            version = version
+
+            from components.java
+        }
+    }
 }
