@@ -55,7 +55,7 @@
 		}
 	}
 #else
-	static __thread JNIEnv* envTLS = 0;
+	static thread_local JNIEnv* envTLS = 0;
 
 	void createTLS() {
 	}
