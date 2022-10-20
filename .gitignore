@@ -3,7 +3,9 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-src/main/resources
+
+src/main/resources/libFrankinGlfw.so
+src/main/resources/FrankinGlfw.dll
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
@@ -41,4 +43,4 @@ bin/
 
 ### Mac OS ###
 .DS_Store
-/src/main/resources/
+#/src/main/resources/
