@@ -5,33 +5,11 @@ import java.util.List;
 
 public class Glfw {
 
-	/**
-	 * Practically sto.. *cough* copied from mc b1.7.3
-	 * @param libName name of the library
-	 * @param libPrefix if lib should be prefixed to the libname for unix, 99% of the time this will be true
-	 * @param macLibPrefix if lib should be prefixed to the libname for mac, useful for bundles
-	 * @param macDylib if .dylib should be used for mac, .so otherwise
-	 * @return a true name for the library based on the OS
-	 */
-	public static String getOsDynamicLibName(String libName, boolean libPrefix, boolean macLibPrefix, boolean macDylib) {
-		String osName = System.getProperty("os.name").toLowerCase();
-		if (osName.contains("win")) {
-			return (libName + ".dll");
-		} else if (osName.contains("mac")) {
-			return ((macLibPrefix ? "lib" : "") + libName + (macDylib ? ".dylib" : ".so"));
-		} else { // this should be some unix-like architecture
-			return ((macLibPrefix ? "lib" : "") + libName + ".so");
-		}
-	}
-	static {
-		try {
-			// https://github.com/adamheinrich/native-utils
-			String libName = getOsDynamicLibName("FrankinGlfw", true, true, false);
-			System.out.println("Loading dynamic library " + libName);
-			NativeUtils.loadLibraryFromJar("/" + libName);
-		} catch (Exception e) {e.printStackTrace();}
-	}
 
+	public static final String LIB_NAME = "FrankinGlfw";
+	public static void LoadFrankinGlfwDylib(String nativesPath) {
+		NativeUtils.LoadDynLib(LIB_NAME, nativesPath);
+	}
 
 	public static final int GLFW_VERSION_MAJOR = 3;
 	public static final int GLFW_VERSION_MINOR = 4;

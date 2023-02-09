@@ -8,9 +8,14 @@ public class Main {
         new Main().runTests();
     }
 
-
+    public static final String javaLibPathPropertyName = "java.library.path";
+    public static final String testLibPath = "/home/jaquobia/Gits/frankinglfw/bin";
     @Test
     public void runTests() {
+        String libPath = System.getProperty(javaLibPathPropertyName) + ":" + testLibPath;
+        System.setProperty(javaLibPathPropertyName, libPath);
+
+        Glfw.LoadFrankinGlfwDylib(testLibPath);
         Glfw.glfwInit();
         Glfw.glfwDefaultWindowHints();
         GlfwCallback callback = getCallback();
